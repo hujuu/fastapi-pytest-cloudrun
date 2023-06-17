@@ -1,13 +1,14 @@
 from sqlalchemy.orm import Session
 import api.models.task as task_model
 import api.schemas.task as task_schema
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-def create_task(db: Session, task_create: task_schema.TaskCreate) -> task_model.Task:
+def create_task(db: AsyncSession, task_create: task_schema.TaskCreate) -> task_model.Task:
     task = task_model.Task(**task_create.dict())
     db.add(task)
-    db.commit()
-    db.refresh(task)
+    await db.commit()
+    await db.refresh(task)
     return task
 
 
