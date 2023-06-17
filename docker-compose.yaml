@@ -1,0 +1,11 @@
+version: '3'
+services:
+  demo-app:
+    build: .
+    volumes:
+      - .dockervenv:/src/.venv
+      - .:/src
+    ports:
+      - 8000:8000 # ホストマシンのポート 8000 を、docker 内のポート 8000 に 接続する
+    environment:
+      - WATCHFILES_FORCE_POLLING=true # 環境によってホットリロードのために必要
