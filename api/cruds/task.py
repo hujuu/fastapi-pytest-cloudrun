@@ -4,7 +4,7 @@ import api.schemas.task as task_schema
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-def create_task(db: AsyncSession, task_create: task_schema.TaskCreate) -> task_model.Task:
+async def create_task(db: AsyncSession, task_create: task_schema.TaskCreate) -> task_model.Task:
     task = task_model.Task(**task_create.dict())
     db.add(task)
     await db.commit()
