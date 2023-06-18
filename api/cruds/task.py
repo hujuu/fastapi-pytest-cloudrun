@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 import api.models.task as task_model
 import api.schemas.task as task_schema
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.engine import Result
 
 
 async def create_task(db: AsyncSession, task_create: task_schema.TaskCreate) -> task_model.Task:
@@ -10,10 +12,6 @@ async def create_task(db: AsyncSession, task_create: task_schema.TaskCreate) -> 
     await db.commit()
     await db.refresh(task)
     return task
-
-
-from sqlalchemy import select
-from sqlalchemy.engine import Result
 
 
 async def get_tasks_with_done(db: Session) -> list[tuple[int, str, bool]]:
