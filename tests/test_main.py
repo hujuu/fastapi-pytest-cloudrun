@@ -68,3 +68,50 @@ async def test_done_flag(async_client):
     # 既に完了フラグが外れているので404を返却
     response = await async_client.delete("/tasks/1/done")
     assert response.status_code == starlette.status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_due_date(async_client):
+    response = await async_client.post("/tasks", json={"title": "テストタスク", "due_date": "2024-12-01"})
+    assert response.status_code == starlette.status.HTTP_200_OK
+
+    response = await async_client.post("/tasks",
+                                       json={"title": "テストタスク", "due_date": "2024-12-32"})
+    assert response.status_code == starlette.status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    response = await async_client.post("/tasks", json={"title": "テストタスク", "due_date": "2024/12/01"})
+    assert response.status_code == starlette.status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    response = await async_client.post("/tasks", json={"title": "テストタスク", "due_date": "2024-1201"})
+    assert response.status_code == starlette.status.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
+async def test_due_date(async_client):
+    input_list = ["2024-12-01", "2024-12-32", "2024/12/01", "2024-1201"]
+    expectation_list = [
+        starlette.status.HTTP_200_OK,
+        starlette.status.HTTP_422_UNPROCESSABLE_ENTITY,
+        starlette.status.HTTP_422_UNPROCESSABLE_ENTITY,
+        starlette.status.HTTP_422_UNPROCESSABLE_ENTITY,
+    ]
+    for input_param, expectation in zip(input_list, expectation_list):
+        response = await async_client.post("/tasks", json={"title": "テストタスク", "due_date": input_param})
+        assert response.status_code == expectation
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "input_param, expectation",
+    [
+        ("2024-12-01", starlette.status.HTTP_200_OK),
+        ("2024-12-32", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+        ("2024/12/01", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+        ("2024-1201", starlette.status.HTTP_422_UNPROCESSABLE_ENTITY),
+    ],
+)
+async def test_due_date(input_param, expectation, async_client):
+    response = await async_client.post(
+        "/tasks", json={"title": "テストタスク", "due_date": input_param}
+    )
+    assert response.status_code == expectation
