@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 class TaskBase(BaseModel):
     title: str | None = Field(None, example="クリーニングを取りに行く")
+    description: str | None = Field(None, example="近所のクリーニング屋からスーツを受け取る")
     due_date: datetime.date | None = Field(None, example="2024-12-01")
 
 

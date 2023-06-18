@@ -19,6 +19,8 @@ async def get_tasks_with_done(db: Session) -> list[tuple[int, str, bool]]:
         select(
             task_model.Task.id,
             task_model.Task.title,
+            task_model.Task.description,
+            task_model.Task.due_date,
             task_model.Done.id.isnot(None).label("done"),
         ).outerjoin(task_model.Done)
     )
@@ -32,8 +34,13 @@ async def get_task(db: AsyncSession, task_id: int) -> task_model.Task | None:
     return result.scalars().first()
 
 
-async def update_task(db: AsyncSession, task_create: task_schema.TaskCreate, original: task_model.Task) -> task_model.Task:
+async def update_task(
+        db: AsyncSession,
+        task_create: task_schema.TaskCreate, original: task_model.Task
+) -> task_model.Task:
     original.title = task_create.title
+    original.description = task_create.description
+    original.due_date = task_create.due_date
     db.add(original)
     await db.commit()
     await db.refresh(original)
